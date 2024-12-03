@@ -1,0 +1,4 @@
+cmake-build-debug/*
+.idea/*
+day-1.txt
+day-1-nos.txt
