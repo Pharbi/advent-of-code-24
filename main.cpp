@@ -7,6 +7,7 @@
 #include <memory>
 #include <stdexcept>
 #include <queue>
+#include <regex>
 
 class AdventDay {
     public:
@@ -165,6 +166,245 @@ class DayTwo : public AdventDay {
         }
 };
 
+class DayThree: public AdventDay {
+    public:
+    explicit DayThree(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    void parseInput() override {
+        std::cout << "Day Three\n";
+    }
+    void solve() override {
+        std::ifstream input_file(input_file_path);
+        if (!input_file.is_open()) {
+            std::cerr << "Error: Could not open the file day-3.txt" << std::endl;
+            return;
+        }
+        std::vector<int> products_v1 = parse_and_calculate_products_v1(input_file);
+        int sum_of_products_v1 = vec_sum_calculator(products_v1);
+        std::cout << "Parsed products v1 sum is " << sum_of_products_v1 << std::endl;
+
+
+        input_file.clear();
+        input_file.seekg(0);
+
+        std::vector<int> products_v2 = parse_and_calculate_products_v2(input_file);
+        int sum_of_products_v2 = vec_sum_calculator(products_v2);
+        std::cout << "Parsed products v2 sum is " << sum_of_products_v2 << std::endl;
+    }
+    private:
+    int vec_sum_calculator(const std::vector<int>& nums) {
+        if (nums.empty()){ return 0; }
+        int sum = 0;
+
+        for(size_t i = 0; i < nums.size(); i++){
+            sum += nums[i];
+        }
+        return sum;
+    }
+    std::vector<int> parse_and_calculate_products_v1(std::istream& input_stream) {
+        std::vector<int> nums;
+        int a, b;
+        std::regex pattern(R"(mul\((\d+),(\d+)\))");
+        std::string line;
+
+        while (std::getline(input_stream, line)) {
+            std::sregex_iterator begin(line.begin(), line.end(), pattern);
+            std::sregex_iterator end;
+            for (std::sregex_iterator it = begin; it != end; ++it) {
+                std::smatch match = *it;
+                std::string first_num = match[1];
+                std::string second_num = match[2];
+
+                std::stringstream f_n(first_num);
+                f_n >> a;
+                std::stringstream s_n(second_num);
+                s_n >> b;
+
+                nums.push_back(a * b);
+            }
+        }
+        return nums;
+
+    }
+
+    std::vector<int> parse_and_calculate_products_v2(std::istream& input_stream) {
+        std::vector<int> nums;
+        int a, b;
+        std::regex pattern_with_extra(R"(mul\((\d+),(\d+)\)|do\(\)|don\'t\(\))");
+        std::string line;
+        bool have_seen_do_not = false;
+
+        while (std::getline(input_stream, line)) {
+            std::sregex_iterator begin(line.begin(), line.end(), pattern_with_extra);
+            std::sregex_iterator end;
+
+            for (std::sregex_iterator it = begin; it != end; ++it){
+                std::smatch match = *it;
+                if (match[1].matched && match[2].matched) {
+                    if (have_seen_do_not){
+                        continue;
+                    }
+                    std::string first_num = match[1];
+                    std::stringstream f_n(first_num);
+                    f_n >> a;
+
+                    std::string second_num = match[2];
+                    std::stringstream s_n(second_num);
+                    s_n >> b;
+
+                    nums.push_back(a * b);
+                } else if (match.str() == "do()") {
+                    have_seen_do_not = false;
+                } else if (match.str() == "don't()"){
+                    have_seen_do_not = true;
+                }
+            }
+        }
+        return nums;
+    }
+};
+
+class DayFour: public AdventDay {
+public:
+    explicit DayFour(const std::string& input_file_path) : AdventDay(input_file_path) {}
+
+    void parseInput() override {
+        std::ifstream input_file(input_file_path);
+        if (!input_file.is_open()) {
+            std::cerr << "Error: Could not open the file day-4.txt" << std::endl;
+            return;
+        }
+
+        std::string line;
+        while (std::getline(input_file, line)) {
+            if (line.empty()) break;
+            grid.push_back(line);
+        }
+
+        input_file.close();
+    }
+
+    void solve() override {
+        parseInput();
+        int res_one = countXMAS(grid);
+        std::cout << "Found XMAS this many times " << res_one << std::endl;
+
+        int res_two = countXMASPatterns(grid);
+        std::cout << "Found XMAS this many times " << res_two << std::endl;
+    }
+
+    private:
+    std::vector<std::string> grid;
+
+    bool checkXMASPtOne(const std::vector<std::string>& grid, int row, int col, int drow, int dcol) {
+        const std::string target = "XMAS";
+        int R = grid.size();
+        int C = grid[0].size();
+
+        for (int i = 0; i < 4; i++) {
+            int newRow = row + i * drow;
+            int newCol = col + i * dcol;
+
+            if (newRow < 0 || newRow >= R || newCol < 0 || newCol >= C) {
+                return false;
+            }
+
+            if (grid[newRow][newCol] != target[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    int countXMAS(const std::vector<std::string>& grid) {
+        int count = 0;
+        int R = grid.size();
+        int C = grid[0].size();
+
+        std::vector<std::pair<int, int>> directions = {
+            {0, 1},
+            {1, 0},
+            {1, 1},
+            {1, -1},
+            {0, -1},
+            {-1, 0},
+            {-1, 1},
+            {-1, -1}
+        };
+
+        for (int i = 0; i < R; i++) {
+            for (int j = 0; j < C; j++) {
+                for (const auto& dir : directions) {
+                    if (checkXMASPtOne(grid, i, j, dir.first, dir.second)) {
+                        count++;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+
+    bool inBounds(int row, int col, int R, int C) {
+        return row >= 0 && row < R && col >= 0 && col < C;
+    }
+
+    bool checkDiagonalLine(const std::vector<std::string>& grid, int centerRow, int centerCol,
+                          int drow, int dcol) {
+        int R = grid.size();
+        int C = grid[0].size();
+
+        int row1 = centerRow + drow;
+        int col1 = centerCol + dcol;
+        int row2 = centerRow - drow;
+        int col2 = centerCol - dcol;
+
+        if (!inBounds(row1, col1, R, C) || !inBounds(row2, col2, R, C)) {
+            return false;
+        }
+
+        char c1 = grid[row1][col1];
+        char c2 = grid[row2][col2];
+
+        return ((c1 == 'M' && c2 == 'S') || (c1 == 'S' && c2 == 'M'));
+    }
+
+    bool checkXMASPtTwo(const std::vector<std::string>& grid, int row, int col) {
+        if (grid[row][col] != 'A') {
+            return false;
+        }
+
+        std::vector<std::pair<int, int>> diagonals = {
+            {1, 1},
+            {1, -1}
+        };
+
+        for (int i = 0; i < diagonals.size(); i++) {
+            for (int j = i + 1; j < diagonals.size(); j++) {
+                if (checkDiagonalLine(grid, row, col, diagonals[i].first, diagonals[i].second) &&
+                    checkDiagonalLine(grid, row, col, diagonals[j].first, diagonals[j].second)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    int countXMASPatterns(const std::vector<std::string>& grid) {
+        int count = 0;
+        int R = grid.size();
+        int C = grid[0].size();
+
+        for (int i = 1; i < R - 1; i++) {
+            for (int j = 1; j < C - 1; j++) {
+                if (checkXMASPtTwo(grid, i, j)) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+
+};
+
 
 int main() {
     try {
@@ -172,6 +412,10 @@ int main() {
         dayOne->solve();
         std::unique_ptr<AdventDay> dayTwo = std::make_unique<DayTwo>("../day-2.txt");
         dayTwo->solve();
+        std::unique_ptr<AdventDay> dayThree = std::make_unique<DayThree>("../day-3.txt");
+        dayThree->solve();
+        std::unique_ptr<AdventDay> dayFour = std::make_unique<DayFour>("../day-4.txt");
+        dayFour->solve();
     } catch (const std::exception& e) {
         std::cerr << e.what() << "\n";
         return 1;
