@@ -24,9 +24,9 @@ class AdventDay {
         std::string input_file_path;
 };
 
-class DayOne : public AdventDay {
+class One : public AdventDay {
 public:
-    explicit DayOne(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit One(const std::string& input_file_path) : AdventDay(input_file_path) {}
 
     void parseInput() override {
         std::ifstream input_file(input_file_path);
@@ -88,9 +88,9 @@ private:
     }
 };
 
-class DayTwo : public AdventDay {
+class Two : public AdventDay {
     public:
-        explicit DayTwo(const std::string& input_file_path) : AdventDay(input_file_path) {}
+        explicit Two(const std::string& input_file_path) : AdventDay(input_file_path) {}
         void parseInput() override {
             std::cout << "Day Two\n";
         };
@@ -169,9 +169,9 @@ class DayTwo : public AdventDay {
         }
 };
 
-class DayThree: public AdventDay {
+class Three: public AdventDay {
     public:
-    explicit DayThree(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Three(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {
         std::cout << "Day Three\n";
     }
@@ -266,9 +266,9 @@ class DayThree: public AdventDay {
     }
 };
 
-class DayFour: public AdventDay {
+class Four: public AdventDay {
 public:
-    explicit DayFour(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Four(const std::string& input_file_path) : AdventDay(input_file_path) {}
 
     void parseInput() override {
         std::ifstream input_file(input_file_path);
@@ -408,23 +408,23 @@ public:
 
 };
 
-class DayFive : public AdventDay {
+class Five : public AdventDay {
 public:
-    explicit DayFive(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Five(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {
         parseInput();
     }
 };
 
-class DaySix : public AdventDay {
+class Six : public AdventDay {
     public:
-    explicit DaySix(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Six(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DaySeven : public AdventDay {
+class Seven : public AdventDay {
     int64_t sum = 0;
 
     int64_t concatenate(int64_t a, int64_t b) {
@@ -471,7 +471,7 @@ class DaySeven : public AdventDay {
         return false;
     }
 public:
-    explicit DaySeven(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Seven(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() {
         std::ifstream input_file(input_file_path);
         if (!input_file.is_open()) {
@@ -506,92 +506,92 @@ public:
     }
 };
 
-class DayEight : public AdventDay {
+class Eight : public AdventDay {
     public:
-    explicit DayEight(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Eight(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 
 };
 
-class DayNine : public AdventDay {
+class Nine : public AdventDay {
     public:
-    explicit DayNine(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Nine(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayTen : public AdventDay {
+class Ten : public AdventDay {
     public:
-    explicit DayTen(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Ten(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayEleven : public AdventDay {
+class Eleven : public AdventDay {
     public:
-    explicit DayEleven(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Eleven(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayTwelve : public AdventDay {
+class Twelve : public AdventDay {
 public:
-    explicit DayTwelve(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Twelve(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayThirteen : public AdventDay {
+class Thirteen : public AdventDay {
 public:
-    explicit DayThirteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Thirteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayFourteen : public AdventDay {
+class Fourteen : public AdventDay {
 public:
-    explicit DayFourteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Fourteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayFifteen : public AdventDay {
+class Fifteen : public AdventDay {
 public:
-    explicit DayFifteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Fifteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DaySixteen : public AdventDay {
+class Sixteen : public AdventDay {
 public:
-    explicit DaySixteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Sixteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DaySeventeen : public AdventDay {
+class Seventeen : public AdventDay {
 public:
-    explicit DaySeventeen(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Seventeen(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayEighteen : public AdventDay {
+class Eighteen : public AdventDay {
 public:
-    explicit DayEighteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Eighteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayNineteen : public AdventDay {
+class Nineteen : public AdventDay {
 public:
-    explicit DayNineteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit Nineteen(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayTwenty : public AdventDay {
+class Twenty : public AdventDay {
 private:
     struct Position {
         int row, col;
@@ -713,7 +713,7 @@ private:
     }
 
 public:
-    explicit DayTwenty(const std::string& inputFilePath)
+    explicit Twenty(const std::string& inputFilePath)
         : AdventDay(inputFilePath) {}
 
     void solve() override {
@@ -737,97 +737,98 @@ public:
     }
 };
 
-class DayTwentyOne: public AdventDay {
+class TwentyOne: public AdventDay {
 public:
-    explicit DayTwentyOne(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit TwentyOne(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayTwentyTwo : public AdventDay {
+class TwentyTwo : public AdventDay {
 public:
-    explicit DayTwentyTwo(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit TwentyTwo(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayTwentyThree : public AdventDay {
+class TwentyThree : public AdventDay {
 public:
-    explicit DayTwentyThree(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit TwentyThree(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayTwentyFour : public AdventDay {
+class TwentyFour : public AdventDay {
 public:
-    explicit DayTwentyFour(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit TwentyFour(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
-class DayTwentyFive : public AdventDay {
+class TwentyFive : public AdventDay {
 public:
-    explicit DayTwentyFive(const std::string& input_file_path) : AdventDay(input_file_path) {}
+    explicit TwentyFive(const std::string& input_file_path) : AdventDay(input_file_path) {}
     void parseInput() override {}
     void solve() override {}
 };
 
 int main() {
     try {
-        std::unique_ptr<AdventDay> dayOne = std::make_unique<DayOne>("../day-1.txt");
-        dayOne->solve();
-        std::unique_ptr<AdventDay> dayTwo = std::make_unique<DayTwo>("../day-2.txt");
-        dayTwo->solve();
-        std::unique_ptr<AdventDay> dayThree = std::make_unique<DayThree>("../day-3.txt");
-        dayThree->solve();
-        std::unique_ptr<AdventDay> dayFour = std::make_unique<DayFour>("../day-4.txt");
-        dayFour->solve();
-        std::unique_ptr<AdventDay> dayFive = std::make_unique<DayFive>("../day-5.txt");
-        dayFive->solve();
-        std::unique_ptr<AdventDay> daySix = std::make_unique<DaySix>("../day-6.txt");
-        daySix->solve();
-        std::unique_ptr<AdventDay> daySeven = std::make_unique<DaySeven>("../day-7.txt");
-        daySeven->solve();
+        std::unique_ptr<AdventDay> one = std::make_unique<One>("../day-1.txt");
+        one->solve();
+        std::unique_ptr<AdventDay> two = std::make_unique<Two>("../day-2.txt");
+        two->solve();
+        std::unique_ptr<AdventDay> three = std::make_unique<Three>("../day-3.txt");
+        three->solve();
+        std::unique_ptr<AdventDay> four = std::make_unique<Four>("../day-4.txt");
+        four->solve();
+        std::unique_ptr<AdventDay> five = std::make_unique<Five>("../day-5.txt");
+        five->solve();
+        std::unique_ptr<AdventDay> six = std::make_unique<Six>("../day-6.txt");
+        six->solve();
+        std::unique_ptr<AdventDay> seven = std::make_unique<Seven>("../day-7.txt");
+        seven->solve();
 
         // unimplemented
-        // std::unique_ptr<AdventDay> dayEight = std::make_unique<DayEight>("../day-8.txt");
-        // dayEight->solve();
-        // std::unique_ptr<AdventDay> dayNine = std::make_unique<DayNine>("../day-9.txt");
-        // dayNine->solve();
-        // std::unique_ptr<AdventDay> dayTen = std::make_unique<DayTen>("../day-10.txt");
-        // dayTen->solve();
-        // std::unique_ptr<AdventDay> dayEleven = std::make_unique<DayEleven>("../day-11.txt");
-        // dayEleven->solve();
-        // std::unique_ptr<AdventDay> dayTwelve = std::make_unique<DayTwelve>("../day-12.txt");
-        // dayTwelve->solve();
-        // std::unique_ptr<AdventDay> dayThirteen = std::make_unique<DayThirteen>("../day-13.txt");
-        // dayThirteen->solve();
-        // std::unique_ptr<AdventDay> dayFourteen = std::make_unique<DayFourteen>("../day-14.txt");
-        // dayFourteen->solve();
-        // std::unique_ptr<AdventDay> dayFifteen = std::make_unique<DayFifteen>("../day-15.txt");
-        // dayFifteen->solve();
-        // std::unique_ptr<AdventDay> daySixteen = std::make_unique<DaySixteen>("../day-16.txt");
-        // daySixteen->solve();
-        // std::unique_ptr<AdventDay> daySeventeen = std::make_unique<DaySeventeen>("../day-17.txt");
-        // daySeventeen->solve();
-        // std::unique_ptr<AdventDay> dayEighteen = std::make_unique<DayEighteen>("../day-18.txt");
-        // dayEighteen->solve();
-        // std::unique_ptr<AdventDay> dayNineteen = std::make_unique<DayNineteen>("../day-19.txt");
-        // dayNineteen->solve();
+        // std::unique_ptr<AdventDay> eight = std::make_unique<Eight>("../day-8.txt");
+        // eight->solve();
+        // std::unique_ptr<AdventDay> nine = std::make_unique<Nine>("../day-9.txt");
+        // nine->solve();
+        // std::unique_ptr<AdventDay> ten = std::make_unique<Ten>("../day-10.txt");
+        // ten->solve();
+        // std::unique_ptr<AdventDay> eleven = std::make_unique<DayEleven>("../day-11.txt");
+        // eleven->solve();
+        // std::unique_ptr<AdventDay> twelve = std::make_unique<Twelve>("../day-12.txt");
+        // twelve->solve();
+        // std::unique_ptr<AdventDay> thirteen = std::make_unique<Thirteen>("../day-13.txt");
+        // thirteen->solve();
+        // std::unique_ptr<AdventDay> fourteen = std::make_unique<Fourteen>("../day-14.txt");
+        // fourteen->solve();
+        // std::unique_ptr<AdventDay> fifteen = std::make_unique<Fifteen>("../day-15.txt");
+        // Fifteen->solve();
+        // std::unique_ptr<AdventDay> sixteen = std::make_unique<Sixteen>("../day-16.txt");
+        // sixteen->solve();
+        // std::unique_ptr<AdventDay> seventeen = std::make_unique<Seventeen>("../day-17.txt");
+        // seventeen->solve();
+        // std::unique_ptr<AdventDay> eighteen = std::make_unique<Eighteen>("../day-18.txt");
+        // eighteen->solve();
+        // std::unique_ptr<AdventDay> nineteen = std::make_unique<Nineteen>("../day-19.txt");
+        // nineteen->solve();
 
-        std::unique_ptr<AdventDay> dayTwenty = std::make_unique<DayTwenty>("../day-20.txt");
-        dayTwenty->solve();
+        std::unique_ptr<AdventDay> twenty = std::make_unique<Twenty>("../day-20.txt");
+        twenty->solve();
 
         // unimplemented
-        // std::unique_ptr<AdventDay> dayTwentyOne = std::make_unique<DayTwentyOne>("../day-21.txt");
-        // dayTwentyOne->solve();
-        // std::unique_ptr<AdventDay> dayTwentyTwo = std::make_unique<DayTwentyTwo>("../day-22.txt");
-        // dayTwentyTwo->solve();
-        // std::unique_ptr<AdventDay> dayTwentyThree = std::make_unique<DayTwentyThree>("../day-23.txt");
-        // dayTwentyThree->solve();
-        // std::unique_ptr<AdventDay> dayTwentyFour = std::make_unique<DayTwentyFour>("../day-24.txt");
-        // dayTwentyFour->solve();
-        // std::unique_ptr<AdventDay> dayTwentyFive = std::make_unique<DayTwentyFive>("../day-25.txt");
+        // std::unique_ptr<AdventDay> twenty_one = std::make_unique<TwentyOne>("../day-21.txt");
+        // twenty_one->solve();
+        // std::unique_ptr<AdventDay> twenty_two = std::make_unique<TwentyTwo>("../day-22.txt");
+        // twenty_two->solve();
+        // std::unique_ptr<AdventDay> twenty_three = std::make_unique<TwentyThree>("../day-23.txt");
+        // twenty_three->solve();
+        // std::unique_ptr<AdventDay> twenty_four = std::make_unique<TwentyFour>("../day-24.txt");
+        // twenty_four->solve();
+        // std::unique_ptr<AdventDay> twenty_five = std::make_unique<TwentyFive>("../day-25.txt");
+        // twenty_five->solve();
     } catch (const std::exception& e) {
         std::cerr << e.what() << "\n";
         return 1;
