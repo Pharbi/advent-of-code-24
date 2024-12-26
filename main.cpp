@@ -1001,12 +1001,12 @@ int main() {
         six->solve();
         std::unique_ptr<AdventDay> seven = std::make_unique<Seven>("../day-7.txt");
         seven->solve();
+        std::unique_ptr<AdventDay> eight = std::make_unique<Eight>("../day-8.txt");
+        eight->solve();
+        std::unique_ptr<AdventDay> nine = std::make_unique<Nine>("../day-9.txt");
+        nine->solve();
 
         // unimplemented
-        // std::unique_ptr<AdventDay> eight = std::make_unique<Eight>("../day-8.txt");
-        // eight->solve();
-        // std::unique_ptr<AdventDay> nine = std::make_unique<Nine>("../day-9.txt");
-        // nine->solve();
         // std::unique_ptr<AdventDay> ten = std::make_unique<Ten>("../day-10.txt");
         // ten->solve();
         // std::unique_ptr<AdventDay> eleven = std::make_unique<DayEleven>("../day-11.txt");
