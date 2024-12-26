@@ -507,18 +507,231 @@ public:
 };
 
 class Eight : public AdventDay {
-    public:
-    explicit Eight(const std::string& input_file_path) : AdventDay(input_file_path) {}
-    void parseInput() override {}
-    void solve() override {}
+private:
+    struct Point {
+        int x, y;
 
+        Point(int x, int y) : x(x), y(y) {}
+
+        bool isCollinearWith(const Point& p2, const Point& p3) const {
+            // Using cross product to check collinearity
+            return (int64_t)(p2.y - y) * (p3.x - p2.x) ==
+                   (int64_t)(p2.x - x) * (p3.y - p2.y);
+        }
+
+        std::string toString() const {
+            return std::to_string(x) + "," + std::to_string(y);
+        }
+    };
+
+    std::vector<std::vector<char>> map;
+
+    std::set<std::string> findAntinodes(const std::vector<Point>& antennas) {
+        std::set<std::string> antinodes;
+        if (antennas.size() < 2) return antinodes;
+
+        for (const Point& antenna : antennas) {
+            antinodes.insert(antenna.toString());
+        }
+
+        for (size_t x = 0; x < map.size(); x++) {
+            for (size_t y = 0; y < map[0].size(); y++) {
+                Point p(x, y);
+
+                for (size_t i = 0; i < antennas.size(); i++) {
+                    for (size_t j = i + 1; j < antennas.size(); j++) {
+                        if (p.isCollinearWith(antennas[i], antennas[j])) {
+                            antinodes.insert(p.toString());
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return antinodes;
+    }
+
+    std::string partTwo() {
+        std::set<std::string> allAntinodes;
+        std::map<char, std::vector<Point>> antennaMap;
+
+        for (size_t i = 0; i < map.size(); i++) {
+            for (size_t j = 0; j < map[i].size(); j++) {
+                char freq = map[i][j];
+                if (freq != '.') {
+                    antennaMap[freq].emplace_back(i, j);
+                }
+            }
+        }
+
+        for (const auto& [freq, sameFreqAntennas] : antennaMap) {
+            std::set<std::string> frequencyAntinodes = findAntinodes(sameFreqAntennas);
+            allAntinodes.insert(frequencyAntinodes.begin(), frequencyAntinodes.end());
+        }
+
+        return std::to_string(allAntinodes.size());
+    }
+
+public:
+    explicit Eight(const std::string& input_file_path) : AdventDay(input_file_path) {}
+
+    void parseInput() override {
+        std::ifstream input_file(input_file_path);
+        std::string line;
+
+        while (std::getline(input_file, line)) {
+            if (!line.empty()) {
+                std::vector<char> row(line.begin(), line.end());
+                map.push_back(row);
+            }
+        }
+    }
+
+    void solve() override {
+        std::cout << "Part Two: " << partTwo() << std::endl;
+    }
 };
 
 class Nine : public AdventDay {
-    public:
+private:
+    std::vector<std::string> input;
+    long fileIdx;
+
+    long sumBlocksAndIds(const std::vector<std::string>& blocks) {
+        long total = 0;
+        for (size_t i = 0; i < blocks.size(); i++) {
+            if (blocks[i] != ".") {
+                total += i * std::stol(blocks[i]);
+            }
+        }
+        return total;
+    }
+
+    std::vector<std::string> moveBlocksV1(const std::vector<std::string>& blocks) {
+        std::vector<std::string> copiedBlocks = blocks;
+        bool movesMade;
+
+        do {
+            movesMade = false;
+            int rightmostFile = copiedBlocks.size() - 1;
+
+            while (rightmostFile >= 0 && copiedBlocks[rightmostFile] == ".") {
+                rightmostFile--;
+            }
+
+            if (rightmostFile >= 0) {
+                int leftmostSpace = 0;
+                while (leftmostSpace < rightmostFile && copiedBlocks[leftmostSpace] != ".") {
+                    leftmostSpace++;
+                }
+
+                if (leftmostSpace < rightmostFile && copiedBlocks[leftmostSpace] == ".") {
+                    std::string fileId = copiedBlocks[rightmostFile];
+                    copiedBlocks[leftmostSpace] = fileId;
+                    copiedBlocks[rightmostFile] = ".";
+                    movesMade = true;
+                }
+            }
+        } while (movesMade);
+
+        return copiedBlocks;
+    }
+
+    std::vector<std::string> moveBlocksV2(const std::vector<std::string>& blocks) {
+        std::vector<std::string> copiedBlocks = blocks;
+        std::map<int, std::pair<int, int>> fileInfo;
+        int maxId = -1;
+
+        for (size_t i = 0; i < copiedBlocks.size(); i++) {
+            const std::string& block = copiedBlocks[i];
+            if (block != ".") {
+                int id = std::stoi(block);
+                maxId = std::max(maxId, id);
+                if (fileInfo.find(id) == fileInfo.end()) {
+                    fileInfo[id] = {i, 1};
+                } else {
+                    fileInfo[id].second++;
+                }
+            }
+        }
+
+        for (int id = maxId; id >= 0; id--) {
+            auto it = fileInfo.find(id);
+            if (it == fileInfo.end()) continue;
+
+            int fileStart = it->second.first;
+            int fileSize = it->second.second;
+
+            int consecutiveSpace = 0;
+            int spaceStart = -1;
+
+            for (int i = 0; i < fileStart; i++) {
+                if (copiedBlocks[i] == ".") {
+                    if (spaceStart == -1) spaceStart = i;
+                    consecutiveSpace++;
+                    if (consecutiveSpace >= fileSize) break;
+                } else {
+                    consecutiveSpace = 0;
+                    spaceStart = -1;
+                }
+            }
+
+            if (consecutiveSpace >= fileSize) {
+                std::string idStr = std::to_string(id);
+                for (int i = 0; i < fileSize; i++) {
+                    copiedBlocks[spaceStart + i] = idStr;
+                    copiedBlocks[fileStart + i] = ".";
+                }
+            }
+        }
+
+        return copiedBlocks;
+    }
+
+    long partOne() {
+        std::vector<std::string> movedBlocks = moveBlocksV1(input);
+        return sumBlocksAndIds(movedBlocks);
+    }
+
+    long partTwo() {
+        std::vector<std::string> movedBlocks = moveBlocksV2(input);
+        return sumBlocksAndIds(movedBlocks);
+    }
+
+public:
     explicit Nine(const std::string& input_file_path) : AdventDay(input_file_path) {}
-    void parseInput() override {}
-    void solve() override {}
+
+    void parseInput() override {
+        std::ifstream input_file(input_file_path);
+        char c;
+        int fileId = 0;
+        bool isFile = true;
+
+        while (input_file.get(c)) {
+            int size = c - '0';
+            if (size >= 0) {
+                if (isFile) {
+                    for (int i = 0; i < size; i++) {
+                        input.push_back(std::to_string(fileId));
+                    }
+                    fileId++;
+                } else {
+                    for (int i = 0; i < size; i++) {
+                        input.push_back(".");
+                    }
+                }
+                isFile = !isFile;
+            }
+        }
+        fileIdx = fileId - 1;
+    }
+
+    void solve() override {
+        parseInput();
+        std::cout << partOne() << std::endl;
+        std::cout << partTwo() << std::endl;
+    }
 };
 
 class Ten : public AdventDay {

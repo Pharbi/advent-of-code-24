@@ -11,8 +11,8 @@ Learning C++ through Advent of Code problems
 | [X]    | [Day Five](https://adventofcode.com/2024/day/5) |
 | [X]    | [Day Six](https://adventofcode.com/2024/day/6) |
 | [X]    | [Day Seven](https://adventofcode.com/2024/day/7) |
-| [ ]    | [Day Eight](https://adventofcode.com/2024/day/8) |
-| [ ]    | [Day Nine](https://adventofcode.com/2024/day/9) |
+| [X]    | [Day Eight](https://adventofcode.com/2024/day/8) |
+| [X]    | [Day Nine](https://adventofcode.com/2024/day/9) |
 | [ ]    | [Day Ten](https://adventofcode.com/2024/day/10) |
 | [ ]    | [Day Eleven](https://adventofcode.com/2024/day/11) |
 | [ ]    | [Day Twelve](https://adventofcode.com/2024/day/12) |
