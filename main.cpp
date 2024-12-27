@@ -410,18 +410,339 @@ public:
 
 class Five : public AdventDay {
 public:
-    explicit Five(const std::string& input_file_path) : AdventDay(input_file_path) {}
-    void parseInput() override {}
+    explicit Five(const std::string& input_file_path)
+        : AdventDay(input_file_path) {}
+
+    void parseInput() override {
+        std::ifstream file(input_file_path);
+        if (!file.is_open()) {
+            std::cerr << "Error: Could not open file " << input_file_path << std::endl;
+            return;
+        }
+
+        std::string line;
+        while (std::getline(file, line)) {
+            if (line.empty()) {
+                continue;
+            }
+            std::vector<char> row(line.begin(), line.end());
+            grid.push_back(row);
+        }
+
+        file.close();
+    }
+
     void solve() override {
         parseInput();
+
+        int result = simulate_guard_patrol(grid);
+        std::cout << "Number of distinct positions visited: " << result << std::endl;
+    }
+
+private:
+    std::vector<std::vector<char>> grid;
+
+    int simulate_guard_patrol(const std::vector<std::vector<char>>& grid) {
+        int rows = static_cast<int>(grid.size());
+        int cols = static_cast<int>(grid[0].size());
+
+        std::pair<int,int> start_pos{-1, -1};
+        char start_dir = '\0';
+
+        bool found_start = false;
+        for (int i = 0; i < rows && !found_start; ++i) {
+            for (int j = 0; j < cols && !found_start; ++j) {
+                char c = grid[i][j];
+                if (c == '^' || c == 'v' || c == '<' || c == '>') {
+                    start_pos = {i, j};
+                    start_dir = c;
+                    found_start = true;
+                }
+            }
+        }
+
+        if (start_dir == '\0') {
+            return 0;
+        }
+
+        std::map<char, std::pair<int,int>> directions = {
+            {'^', {-1,  0}},  // up
+            {'v', { 1,  0}},  // down
+            {'<', { 0, -1}},  // left
+            {'>', { 0,  1}}   // right
+        };
+
+        // Right turn mapping
+        std::map<char, char> turn_right = {
+            {'^', '>'},
+            {'>', 'v'},
+            {'v', '<'},
+            {'<', '^'}
+        };
+
+        std::set<std::pair<int,int>> visited;
+        visited.insert(start_pos);
+
+        std::pair<int,int> curr_pos = start_pos;
+        char curr_dir = start_dir;
+
+        while (true) {
+            auto [dr, dc] = directions[curr_dir];
+            int next_row = curr_pos.first + dr;
+            int next_col = curr_pos.second + dc;
+
+            if (next_row < 0 || next_row >= rows ||
+                next_col < 0 || next_col >= cols) {
+                break;
+            }
+
+            if (grid[next_row][next_col] == '#') {
+                // Turn right
+                curr_dir = turn_right[curr_dir];
+            } else {
+                // Move forward
+                curr_pos = {next_row, next_col};
+                visited.insert(curr_pos);
+            }
+        }
+
+        return static_cast<int>(visited.size());
     }
 };
 
 class Six : public AdventDay {
-    public:
-    explicit Six(const std::string& input_file_path) : AdventDay(input_file_path) {}
-    void parseInput() override {}
-    void solve() override {}
+public:
+    explicit Six(const std::string& input_file_path)
+        : AdventDay(input_file_path) {}
+
+    void parseInput() override {
+        grid_.clear();
+
+        std::ifstream file(input_file_path);
+        if (!file.is_open()) {
+            std::cerr << "Error: Could not open file " << input_file_path << std::endl;
+            return;
+        }
+
+        std::string line;
+        while (std::getline(file, line)) {
+            if (line.empty()) {
+                continue;
+            }
+            std::vector<char> row(line.begin(), line.end());
+            grid_.push_back(row);
+        }
+        file.close();
+
+        rows_ = static_cast<int>(grid_.size());
+        cols_ = rows_ > 0 ? static_cast<int>(grid_[0].size()) : 0;
+    }
+
+    void solve() override {
+        parseInput();
+        if (grid_.empty() || grid_[0].empty()) {
+            std::cout << 0 << std::endl;
+            return;
+        }
+
+        int result = findValidLoops();
+        std::cout << result << std::endl;
+    }
+
+private:
+    std::vector<std::vector<char>> grid_;
+    int rows_ = 0;
+    int cols_ = 0;
+
+    const std::map<char, std::pair<int,int>> dirToVec_ = {
+        {'^', {-1,  0}},
+        {'v', { 1,  0}},
+        {'<', { 0, -1}},
+        {'>', { 0,  1}}
+    };
+
+    const std::map<char, char> rightTurns_ = {
+        {'^', '>'},
+        {'>', 'v'},
+        {'v', '<'},
+        {'<', '^'}
+    };
+
+    std::vector<std::tuple<std::pair<int,int>, char, char>> getCornerPatterns() const {
+        // Example patterns, each is ((offsetRow, offsetCol), entryDir, exitDir)
+        return {
+            {{0, 0}, 'v', '>'},
+            {{0, 0}, '<', '^'},
+            {{0, 0}, '^', '<'},
+            {{0, 0}, '>', 'v'}
+        };
+    }
+
+    bool isValidCorner(const std::pair<int,int>& pos,
+                       char entryDir,
+                       const std::vector<std::vector<char>>& gridRef) const
+    {
+        int r = pos.first;
+        int c = pos.second;
+
+        if (r < 0 || r >= rows_ || c < 0 || c >= cols_) {
+            return false;
+        }
+
+        auto it = dirToVec_.find(entryDir);
+        if (it == dirToVec_.end()) {
+            return false;
+        }
+        auto [dr, dc] = it->second;
+        int prev_r = r - dr;
+        int prev_c = c - dc;
+
+        if (prev_r < 0 || prev_r >= rows_ || prev_c < 0 || prev_c >= cols_) {
+            return false;
+        }
+
+        return (gridRef[prev_r][prev_c] != '#');
+    }
+
+    std::vector<std::tuple<std::pair<int,int>, char, char>>
+    findPotentialCorners(const std::pair<int,int>& startPos,
+                         char direction,
+                         const std::vector<std::vector<char>>& gridRef) const
+    {
+        std::vector<std::tuple<std::pair<int,int>, char, char>> corners;
+        int row = startPos.first;
+        int col = startPos.second;
+
+        if (direction == '\0') {
+            static const std::vector<char> allDirs = {'^', '>', 'v', '<'};
+            for (char testDir : allDirs) {
+                auto it = dirToVec_.find(testDir);
+                if (it == dirToVec_.end()) {
+                    continue;
+                }
+                auto [dr, dc] = it->second;
+                int tr = row + dr;
+                int tc = col + dc;
+                if (tr >= 0 && tr < rows_ && tc >= 0 && tc < cols_ &&
+                    gridRef[tr][tc] != '#')
+                {
+                    auto subCorners = findPotentialCorners(startPos, testDir, gridRef);
+                    corners.insert(corners.end(), subCorners.begin(), subCorners.end());
+                }
+            }
+            return corners;
+        }
+
+        auto itDir = dirToVec_.find(direction);
+        if (itDir == dirToVec_.end()) {
+            return corners;
+        }
+        auto [dr, dc] = itDir->second;
+
+        int currR = row;
+        int currC = col;
+
+        while (true) {
+            currR += dr;
+            currC += dc;
+
+            if (currR < 0 || currR >= rows_ || currC < 0 || currC >= cols_) {
+                break;
+            }
+
+            if (gridRef[currR][currC] == '#') {
+                if (isValidCorner({currR, currC}, direction, gridRef)) {
+                    auto itTurn = rightTurns_.find(direction);
+                    if (itTurn != rightTurns_.end()) {
+                        corners.push_back({{currR, currC}, direction, itTurn->second});
+                    }
+                }
+                break;
+            }
+
+            if (gridRef[currR][currC] == '.') {
+                if (isValidCorner({currR, currC}, direction, gridRef)) {
+                    auto itTurn = rightTurns_.find(direction);
+                    if (itTurn != rightTurns_.end()) {
+                        corners.push_back({{currR, currC}, direction, itTurn->second});
+                    }
+                }
+            }
+        }
+
+        return corners;
+    }
+
+    bool canFormLoop(const std::pair<int,int>& cornerPos,
+                     const std::pair<int,int>& newObstaclePos,
+                     const std::vector<std::vector<char>>& gridRef) const
+    {
+        std::vector<std::vector<char>> testGrid = gridRef;
+        testGrid[newObstaclePos.first][newObstaclePos.second] = '#';
+
+        std::pair<int,int> currPos = cornerPos;
+        int cornersFound = 0;
+        std::set<std::pair<int,int>> visited;
+        char currDir = '\0';
+
+        while (cornersFound < 4) {
+            auto potCorners = findPotentialCorners(currPos, currDir, testGrid);
+            bool foundNext = false;
+            for (auto &cornerInfo : potCorners) {
+                auto &nextPos  = std::get<0>(cornerInfo);
+                char exitDir   = std::get<2>(cornerInfo);
+
+                if (visited.find(nextPos) == visited.end()) {
+                    visited.insert(nextPos);
+                    currPos = nextPos;
+                    currDir = exitDir;
+                    cornersFound++;
+                    foundNext = true;
+                    break;
+                }
+            }
+            if (!foundNext) {
+                return false;
+            }
+        }
+
+        return (currPos == cornerPos);
+    }
+
+    int findValidLoops()
+    {
+        std::pair<int,int> startPos{-1, -1};
+
+        for (int i = 0; i < rows_; ++i) {
+            bool found = false;
+            for (int j = 0; j < cols_; ++j) {
+                char c = grid_[i][j];
+                if (c == '^' || c == 'v' || c == '<' || c == '>') {
+                    startPos = {i, j};
+                    grid_[i][j] = '.';
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                break;
+            }
+        }
+
+        std::set<std::pair<int,int>> validPositions;
+
+        for (int i = 0; i < rows_; ++i) {
+            for (int j = 0; j < cols_; ++j) {
+                if (grid_[i][j] == '.' && std::make_pair(i, j) != startPos) {
+                    if (canFormLoop({i, j}, {i, j}, grid_)) {
+                        validPositions.insert({i, j});
+                    }
+                }
+            }
+        }
+
+        return static_cast<int>(validPositions.size());
+    }
 };
 
 class Seven : public AdventDay {
@@ -939,6 +1260,8 @@ public:
 
         long long partOne = simulateBlinks(25, false);
         std::cout << "Part One: " << partOne << std::endl;
+        long long partOneDebug = simulateBlinks(25, true);
+        std::cout << "Part One Debugging: " << partOneDebug << std::endl;
 
         long long partTwo = simulateBlinks(75, false);
         std::cout << "Part Two: " << partTwo << std::endl;
