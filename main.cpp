@@ -735,17 +735,312 @@ public:
 };
 
 class Ten : public AdventDay {
-    public:
-    explicit Ten(const std::string& input_file_path) : AdventDay(input_file_path) {}
-    void parseInput() override {}
-    void solve() override {}
+public:
+    explicit Ten(const std::string& input_file_path)
+        : AdventDay(input_file_path){}
+
+    void parseInput() override
+    {
+        std::ifstream file(input_file_path);
+        if (!file.is_open()) {
+            std::cerr << "Error opening file: " << input_file_path << std::endl;
+            return;
+        }
+
+        std::vector<int> line;
+        char character;
+        while (file.get(character)) {
+            if (character == '\n') {
+                if (!line.empty()) {
+                    input_.push_back(line);
+                    line.clear();
+                }
+                continue;
+            }
+            int num = character - '0';
+            line.push_back(num);
+        }
+        if (!line.empty()) {
+            input_.push_back(line);
+        }
+
+        memo_.resize(input_.size(),
+            std::vector<std::optional<int>>(input_[0].size(), std::nullopt));
+    }
+
+    void solve() override
+    {
+        parseInput();
+
+        int peakCount = partOne();
+        std::cout << peakCount << std::endl;
+
+        int distinctTrails = partTwo();
+        std::cout << distinctTrails << std::endl;
+    }
+
+private:
+    static constexpr int DIRECTIONS[4][2] = {
+        { -1,  0 },  // up
+        {  0,  1 },  // right
+        {  0, -1 },  // left
+        {  1,  0 }   // down
+    };
+
+    std::vector<std::vector<int>> input_;
+
+    std::vector<std::vector<std::optional<int>>> memo_;
+
+    bool isInBounds(int row, int col) const
+    {
+        return (row >= 0 && row < static_cast<int>(input_.size())) &&
+               (col >= 0 && col < static_cast<int>(input_[0].size()));
+    }
+
+    bool isValidNeighbor(int r, int c, int requiredHeight) const
+    {
+        if (!isInBounds(r, c)) {
+            return false;
+        }
+        return input_[r][c] == (requiredHeight + 1);
+    }
+
+    void dfs(int row, int col,
+             std::set<std::pair<int,int>>& visited,
+             std::set<std::pair<int,int>>& peaks)
+    {
+        std::pair<int,int> currentPos = { row, col };
+
+        if (visited.find(currentPos) != visited.end()) {
+            return;
+        }
+        visited.insert(currentPos);
+
+        int cellHeight = input_[row][col];
+        if (cellHeight == 9) {
+            peaks.insert(currentPos);
+            return;
+        }
+
+        for (auto& direction : DIRECTIONS) {
+            int newRow = row + direction[0];
+            int newCol = col + direction[1];
+            if (isValidNeighbor(newRow, newCol, cellHeight)) {
+                dfs(newRow, newCol, visited, peaks);
+            }
+        }
+    }
+
+    std::set<std::pair<int,int>> findReachablePeaks(int startRow, int startCol)
+    {
+        std::set<std::pair<int,int>> visited;
+        std::set<std::pair<int,int>> peaks;
+
+        int startHeight = input_[startRow][startCol];
+        if (startHeight != 0) {
+            return peaks;
+        }
+
+        dfs(startRow, startCol, visited, peaks);
+        return peaks;
+    }
+
+    int partOne()
+    {
+        int totalScore = 0;
+        for (int row = 0; row < static_cast<int>(input_.size()); ++row) {
+            for (int col = 0; col < static_cast<int>(input_[row].size()); ++col) {
+                if (input_[row][col] == 0) {
+                    std::set<std::pair<int,int>> peaks = findReachablePeaks(row, col);
+                    totalScore += static_cast<int>(peaks.size());
+                }
+            }
+        }
+        return totalScore;
+    }
+
+    int countAllPaths(int row, int col)
+    {
+        if (memo_[row][col].has_value()) {
+            return memo_[row][col].value();
+        }
+
+        int currHeight = input_[row][col];
+        if (currHeight == 9) {
+            memo_[row][col] = 1;
+            return 1;
+        }
+
+        int totalPathsFromHere = 0;
+        for (auto& direction : DIRECTIONS) {
+            int newRow = row + direction[0];
+            int newCol = col + direction[1];
+
+            if (isInBounds(newRow, newCol) &&
+                input_[newRow][newCol] == (currHeight + 1)) {
+                totalPathsFromHere += countAllPaths(newRow, newCol);
+            }
+        }
+
+        memo_[row][col] = totalPathsFromHere;
+        return totalPathsFromHere;
+    }
+
+    int partTwo()
+    {
+        int totalRating = 0;
+        for (int row = 0; row < static_cast<int>(input_.size()); ++row) {
+            for (int col = 0; col < static_cast<int>(input_[row].size()); ++col) {
+                if (input_[row][col] == 0) {
+                    totalRating += countAllPaths(row, col);
+                }
+            }
+        }
+        return totalRating;
+    }
 };
 
+
 class Eleven : public AdventDay {
-    public:
-    explicit Eleven(const std::string& input_file_path) : AdventDay(input_file_path) {}
-    void parseInput() override {}
-    void solve() override {}
+public:
+    explicit Eleven(const std::string& input_file_path)
+        : AdventDay(input_file_path)
+    {
+    }
+
+    void parseInput() override
+    {
+        std::map<std::string, long long> distribution;
+
+        std::ifstream file(input_file_path);
+        if (!file.is_open()) {
+            std::cerr << "Failed to open file: " << input_file_path << std::endl;
+            return;
+        }
+
+        std::string line;
+        while (std::getline(file, line)) {
+            if (trim(line).empty()) {
+                continue;
+            }
+            std::istringstream iss(line);
+            std::string token;
+            while (iss >> token) {
+                distribution[token] += 1;
+            }
+        }
+
+        input_ = distribution;
+    }
+
+    void solve() override
+    {
+        parseInput();
+
+        long long partOne = simulateBlinks(25, false);
+        std::cout << "Part One: " << partOne << std::endl;
+
+        long long partTwo = simulateBlinks(75, false);
+        std::cout << "Part Two: " << partTwo << std::endl;
+    }
+
+private:
+    std::map<std::string, long long> input_;
+
+    static std::string trim(const std::string& s)
+    {
+        size_t start = 0;
+        while (start < s.size() && std::isspace(static_cast<unsigned char>(s[start]))) {
+            start++;
+        }
+        size_t end = s.size();
+        while (end > start && std::isspace(static_cast<unsigned char>(s[end - 1]))) {
+            end--;
+        }
+        return s.substr(start, end - start);
+    }
+
+    std::vector<std::string> transformStone(const std::string& stone)
+    {
+        if (stone == "0") {
+            return { "1" };
+        }
+
+        if (stone.size() % 2 == 0) {
+            int mid = static_cast<int>(stone.size()) / 2;
+            std::string left  = stone.substr(0, mid);
+            std::string right = stone.substr(mid);
+            return { left, right };
+        }
+
+        std::string multiplied = multiplyStringByInt(stone, 2024);
+        return { multiplied };
+    }
+
+    std::string multiplyStringByInt(const std::string& s, int multiplier)
+    {
+        if (s == "0" || multiplier == 0) {
+            return "0";
+        }
+
+        int carry = 0;
+        std::string result;
+        result.reserve(s.size() + 10);
+
+        for (int i = static_cast<int>(s.size()) - 1; i >= 0; i--) {
+            int digit = s[i] - '0';
+            long long prod = static_cast<long long>(digit) * multiplier + carry;
+            int newDigit = static_cast<int>(prod % 10);
+            carry        = static_cast<int>(prod / 10);
+            result.push_back(static_cast<char>('0' + newDigit));
+        }
+
+        while (carry > 0) {
+            int newDigit = carry % 10;
+            result.push_back(static_cast<char>('0' + newDigit));
+            carry /= 10;
+        }
+
+        std::reverse(result.begin(), result.end());
+        return result;
+    }
+
+    long long simulateBlinks(int numBlinks, bool debug)
+    {
+        std::map<std::string, long long> dist = input_;
+
+        for (int i = 0; i < numBlinks; i++) {
+            std::map<std::string, long long> newDist;
+
+            // For each (stone -> count) in dist, transform the stone
+            for (auto& [stoneValue, count] : dist) {
+                // transformStone returns 1 or 2 new "stones" (as strings)
+                std::vector<std::string> newStones = transformStone(stoneValue);
+
+                // Merge them into newDist
+                for (auto& ns : newStones) {
+                    newDist[ns] += count;
+                }
+            }
+
+            dist = std::move(newDist);
+
+            if (debug && ((i + 1) % 5 == 0)) {
+                long long totalStones = 0;
+                for (auto& kv : dist) {
+                    totalStones += kv.second;
+                }
+                std::cout << "After " << (i + 1) << " blinks: "
+                          << totalStones << " stones" << std::endl;
+            }
+        }
+
+        long long total = 0;
+        for (auto& kv : dist) {
+            total += kv.second;
+        }
+        return total;
+    }
 };
 
 class Twelve : public AdventDay {
@@ -987,30 +1282,30 @@ public:
 
 int main() {
     try {
-        std::unique_ptr<AdventDay> one = std::make_unique<One>("../day-1.txt");
+        std::unique_ptr<AdventDay> one = std::make_unique<One>("../day-one.txt");
         one->solve();
-        std::unique_ptr<AdventDay> two = std::make_unique<Two>("../day-2.txt");
+        std::unique_ptr<AdventDay> two = std::make_unique<Two>("../day-two.txt");
         two->solve();
-        std::unique_ptr<AdventDay> three = std::make_unique<Three>("../day-3.txt");
+        std::unique_ptr<AdventDay> three = std::make_unique<Three>("../day-three.txt");
         three->solve();
-        std::unique_ptr<AdventDay> four = std::make_unique<Four>("../day-4.txt");
+        std::unique_ptr<AdventDay> four = std::make_unique<Four>("../day-four.txt");
         four->solve();
-        std::unique_ptr<AdventDay> five = std::make_unique<Five>("../day-5.txt");
+        std::unique_ptr<AdventDay> five = std::make_unique<Five>("../day-five.txt");
         five->solve();
-        std::unique_ptr<AdventDay> six = std::make_unique<Six>("../day-6.txt");
+        std::unique_ptr<AdventDay> six = std::make_unique<Six>("../day-six.txt");
         six->solve();
-        std::unique_ptr<AdventDay> seven = std::make_unique<Seven>("../day-7.txt");
+        std::unique_ptr<AdventDay> seven = std::make_unique<Seven>("../day-seven.txt");
         seven->solve();
-        std::unique_ptr<AdventDay> eight = std::make_unique<Eight>("../day-8.txt");
+        std::unique_ptr<AdventDay> eight = std::make_unique<Eight>("../day-eight.txt");
         eight->solve();
-        std::unique_ptr<AdventDay> nine = std::make_unique<Nine>("../day-9.txt");
+        std::unique_ptr<AdventDay> nine = std::make_unique<Nine>("../day-nine.txt");
         nine->solve();
+        std::unique_ptr<AdventDay> ten = std::make_unique<Ten>("../day-ten.txt");
+        ten->solve();
+        std::unique_ptr<AdventDay> eleven = std::make_unique<Eleven>("../day-eleven.txt");
+        eleven->solve();
 
         // unimplemented
-        // std::unique_ptr<AdventDay> ten = std::make_unique<Ten>("../day-10.txt");
-        // ten->solve();
-        // std::unique_ptr<AdventDay> eleven = std::make_unique<DayEleven>("../day-11.txt");
-        // eleven->solve();
         // std::unique_ptr<AdventDay> twelve = std::make_unique<Twelve>("../day-12.txt");
         // twelve->solve();
         // std::unique_ptr<AdventDay> thirteen = std::make_unique<Thirteen>("../day-13.txt");
